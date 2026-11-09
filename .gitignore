@@ -1,0 +1,6 @@
+out/
+*.class
+__pycache__/
+.venv/
+demo/fakenews.jar
+

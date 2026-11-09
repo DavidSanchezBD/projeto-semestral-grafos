@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caso Fake News — Rastreamento e Quarentena com Grafos</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <div class="quadro-container">
+    <!-- Cabeçalho estilo arquivo confidencial / jornal -->
+    <header class="painel-topo">
+      <div class="manchete">
+        <div class="carimbo carimbo-topo">CONFIDENCIAL</div>
+        <div class="titulos">
+          <h1>CASO FAKE NEWS: OPERAÇÃO GRAFOS</h1>
+          <p class="subtitulo">ECM306 — Tópicos Avançados de Estrutura de Dados | Instituto Mauá de Tecnologia</p>
+        </div>
+      </div>
+      <div class="autores">
+        <span><strong>Investigadores:</strong> David Daniel (24.00029-9) &amp; Kauã Ortega (24.00031-0)</span>
+        <span><strong>Orientador:</strong> Prof. Calvetti</span>
+      </div>
+    </header>
+
+    <!-- Barra de ferramentas do detetive -->
+    <nav class="barra-controles">
+      <div class="grupo-controles">
+        <label for="sel-paciente"><strong>Paciente Zero:</strong></label>
+        <select id="sel-paciente"></select>
+
+        <button id="btn-propagar" class="btn btn-primario" title="Dispara a propagação do boato pela rede">▶ Propagar Boato</button>
+        <button id="btn-passo" class="btn" title="Avança uma etapa da fila BFS">⏭ Passo a Passo</button>
+        <button id="btn-quarentena" class="btn btn-destaque" title="Calcula o impacto da força bruta e heurísticas">🔎 Analisar Quarentena</button>
+        <button id="btn-limpar" class="btn" title="Limpa o contágio atual">↺ Limpar Propagação</button>
+      </div>
+
+      <div class="grupo-controles grupo-rede">
+        <button id="btn-modo-bloqueio" class="btn btn-alerta" title="Clique nas polaroids para colocar a pessoa em quarentena">Modo Quarentena: OFF</button>
+        <button id="btn-rede-aleatoria" class="btn" title="Carrega rede sintética para teste de escala">Rede Aleatória (n=60)</button>
+        <button id="btn-rede-original" class="btn" title="Restaura a rede original de 28 pessoas">Rede Original (CSV)</button>
+      </div>
+    </nav>
+
+    <!-- Área de trabalho: Quadro de Cortiça + Dossiê Lateral -->
+    <main class="area-investigacao">
+      <!-- Quadro de cortiça com os fios e polaroids -->
+      <section class="quadro-cortica" id="quadro">
+        <svg id="fios-svg" class="camada-fios"></svg>
+        <div id="nos-container" class="camada-nos"></div>
+        <div class="legenda-cortica">
+          <div class="item-legenda"><span class="alfinete pin-familia"></span> Família</div>
+          <div class="item-legenda"><span class="alfinete pin-trabalho"></span> Trabalho</div>
+          <div class="item-legenda"><span class="alfinete pin-faculdade"></span> Faculdade</div>
+          <div class="item-legenda"><span class="alfinete pin-academia"></span> Academia</div>
+          <div class="item-legenda"><span class="alfinete pin-condominio"></span> Condomínio</div>
+          <div class="item-legenda"><span class="borda-articulacao-legenda"></span> Ponto de Articulação</div>
+        </div>
+      </section>
+
+      <!-- Painel lateral estilo dossiê / papel de máquina de escrever -->
+      <aside class="dossie-painel" id="dossie">
+        <div class="clipe-papel"></div>
+        <div class="dossie-conteudo">
+          <h2>DOSSIÊ DA PROPAGAÇÃO</h2>
+          <div class="carimbo carimbo-caso" id="carimbo-status">AGUARDANDO</div>
+
+          <div class="resumo-metricas">
+            <div class="metrica">
+              <span class="valor" id="met-alcancados">0</span>
+              <span class="rotulo">Atingidos</span>
+            </div>
+            <div class="metrica">
+              <span class="valor" id="met-rodadas">0</span>
+              <span class="rotulo">Rodadas (BFS)</span>
+            </div>
+            <div class="metrica">
+              <span class="valor" id="met-bloqueados">0</span>
+              <span class="rotulo">Quarentena</span>
+            </div>
+            <div class="metrica">
+              <span class="valor" id="met-protegidos">0</span>
+              <span class="rotulo">Protegidos</span>
+            </div>
+          </div>
+
+          <!-- Rastreamento da BFS (como no slide 15 da aula T25) -->
+          <div class="secao-dossie">
+            <h3>RASTREAMENTO DA FILA BFS (O(V + E))</h3>
+            <div class="tabela-container">
+              <table class="tabela-rastreamento" id="tabela-bfs">
+                <thead>
+                  <tr>
+                    <th>Etapa</th>
+                    <th>Fila Antes</th>
+                    <th>Vértice Retirado</th>
+                    <th>Novos Descobertos</th>
+                  </tr>
+                </thead>
+                <tbody id="corpo-tabela-bfs">
+                  <tr><td colspan="4" class="msg-vazia">Inicie a propagação para rastrear.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Diagnóstico de Quarentena: Força Bruta vs Heurística -->
+          <div class="secao-dossie">
+            <h3>DIAGNÓSTICO DE QUARENTENA</h3>
+            <div id="alerta-heuristica" class="alerta-comparacao">
+              Clique em <em>Analisar Quarentena</em> para avaliar quem deve ser bloqueado.
+            </div>
+
+            <div class="ranking-container">
+              <h4>Top Candidatos a Bloquear (Força Bruta O(V·(V+E))):</h4>
+              <ul class="lista-ranking" id="lista-ranking">
+                <li class="msg-vazia">Nenhuma análise executada.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Articulações detectadas por Tarjan -->
+          <div class="secao-dossie">
+            <h3>PONTOS DE ARTICULAÇÃO (TARJAN O(V + E))</h3>
+            <p class="desc-articulacoes">Pessoas cuja remoção divide grupos ou isola membros:</p>
+            <div id="tags-articulacoes" class="tags-container"></div>
+          </div>
+
+          <!-- Dica didática -->
+          <div class="nota-rodape">
+            <p><strong>Nota Didática:</strong> Toda a lógica estrutural de grafos, busca em largura, cálculo de articulações e simulação de corte é executada pelo servidor <code>Java</code> nativo via <code>HttpServer</code>.</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
