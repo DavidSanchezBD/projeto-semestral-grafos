@@ -1,0 +1,7 @@
+Em grupo, porém, com entrega individual aqui na plataforma, até o prazo indicado na atividade, elaborar e entregar os artefatos do trabalho do 2o semestre, solicitados no material "IMT-2026-ECM306-T21x-TrabalhoSobreGrafos-ProfCalvetti.pdf", a saber:
+
+1. Relatório da Pesquisa realizada, padrão ABNT, em PDF;
+2. Apresentação do Problema escolhido, em PPTX (no máximo para 5 minutos de apresentação)
+	obs: problema não deve ser algo "clichê", como gps ou mapas!
+3. Demonstração/Solução do Problema, implementada em Java, para ser executada e apresentada em aula, após a apresentação do problema.
+

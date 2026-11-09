@@ -1,0 +1,29 @@
+Trabalho: Grafos e Suas Aplicações
+
+Objetivos:
+• Pesquisar, compilar, relatar e apresentar um resumo sobre o
+tópico solicitado;
+• Elaborar, entregar e apresentar uma aplicação em Java que
+solucione algum problema relacionado ao tópico solicitado;
+
+Tópico:
+• Pesquisa: “Grafos e suas aplicações”; e
+• Implementação: “Resolvendo um problema com Grafo”
+
+Entrega:
+• O trabalho deverá ser feito em grupo, porém a entrega
+deverá ser individual (cada membro do grupo entrega a sua
+cópia);
+• A entrega deverá ser feita pela plataforma CanvasLMS até a
+data estipulada;
+
+Enunciado no Canvas:
+Em grupo, porém, com entrega individual aqui na plataforma, até o prazo indicado na atividade, elaborar e entregar os artefatos do trabalho do 2o semestre, solicitados no material "IMT-2026-ECM306-T21x-TrabalhoSobreGrafos-ProfCalvetti.pdf", a saber:
+
+1. Relatório da Pesquisa realizada, padrão ABNT, em PDF;
+2. Apresentação do Problema escolhido, em PPTX (no máximo para 5 minutos de apresentação)
+	obs: problema não deve ser algo "clichê", como gps ou mapas!
+3. Demonstração/Solução do Problema, implementada em Java, para ser executada e apresentada em aula, após a apresentação do problema.
+
+
+
