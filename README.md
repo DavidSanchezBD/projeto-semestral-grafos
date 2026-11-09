@@ -18,8 +18,9 @@ Todos os artefatos solicitados no enunciado estão compilados e prontos para sub
 
 | # | Artefato | Arquivo | Descrição |
 |---|---|---|---|
-| **1** | **Relatório da Pesquisa (PDF)** | [`Relatorio_Grafos_e_suas_Aplicacoes.pdf`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/Entrega/Relatorio_Grafos_e_suas_Aplicacoes.pdf) | **21 páginas**, padrão ABNT rigoroso (NBR 14724/6023/6024). Cobre fundamentos, lema do aperto de mãos, representações, Euler/Hamilton, Hall/emparelhamentos, Kuratowski/planaridade, coloração, algoritmos (BFS, DFS, Dijkstra, Kahn), técnicas de projeto (Aula T23) e estudo de caso completo com tabelas e gráficos. |
-| **2** | **Apresentação do Problema (PPTX)** | [`Apresentacao_Caso_Fake_News.pptx`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/Entrega/Apresentacao_Caso_Fake_News.pptx) | **6 slides widescreen (16:9)** sob o tema criativo de **"Jornal Investigativo"** (manchetes, recortes, fios vermelhos, carimbos). Inclui **notas de orador** detalhadas com roteiro de fala cronometrado para **5 minutos**, dividido entre David e Kauã. |
+| **1a** | **Relatório de Pesquisa (DOCX Editável)** | [`Relatorio_Grafos_e_suas_Aplicacoes.docx`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/Entrega/Relatorio_Grafos_e_suas_Aplicacoes.docx) | **Versão editável completa em Word** com formatação rigorosa da ABNT (margens 3/3/2/2, Times New Roman 12, entrelinha 1,5, recuo de 1,25 cm, 6 tabelas estilizadas, 5 figuras em alta resolução e referências NBR 6023). Permite edição livre de textos e dados antes do envio final. |
+| **1b** | **Relatório de Pesquisa (PDF Final)** | [`Relatorio_Grafos_e_suas_Aplicacoes.pdf`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/Entrega/Relatorio_Grafos_e_suas_Aplicacoes.pdf) | **21 páginas**, padrão ABNT rigoroso (NBR 14724/6023/6024). Cobre fundamentos, lema do aperto de mãos, representações, Euler/Hamilton, Hall/emparelhamentos, Kuratowski/planaridade, coloração, algoritmos (BFS, DFS, Dijkstra, Kahn), técnicas de projeto (Aula T23) e estudo de caso completo com tabelas e gráficos. |
+| **2** | **Apresentação do Problema (PPTX)** | [`Apresentacao_Caso_Fake_News.pptx`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/Entrega/Apresentacao_Caso_Fake_News.pptx) | **6 slides widescreen (16:9)** sob o tema criativo de **"Jornal Investigativo"** (manchetes, recortes, carimbos). Possui **transições suaves e animações de entrada nativas do PowerPoint** (Zoom e Fade nos carimbos e elementos-chave), design harmonioso sem espaços vazios e **notas de orador** cronometradas para **5 minutos**, divididas entre David e Kauã. |
 | **3** | **Demonstração / Solução em Java** | [`Demo_FakeNews_Java.zip`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/Entrega/Demo_FakeNews_Java.zip) e pasta [`demo/`](file:///c:/Users/david/OneDrive/Documents/Faculdade/Tópicos%20Avançados%20de%20Estrutura%20de%20Dados/Projeto%20Semestral/demo/) | Implementação em **Java puro (JDK 21 LTS)** sem dependências externas. Simula a propagação de fake news em ondas por BFS, calcula quarentena por força bruta $O(V \cdot (V+E))$, compara com a heurística de maior grau e identifica pontes com o Algoritmo de Tarjan $O(V+E)$. Servidor HTTP nativo expõe API REST consumida por interface web interativa estilo quadro de cortiça. |
 
 ---
@@ -58,14 +59,20 @@ Executa a suíte de testes contendo 12 verificações rigorosas (caminho $P_5$, 
 
 Os scripts geradores utilizam Python com ambiente virtual configurado em `%LOCALAPPDATA%\ecm306-venv`:
 ```powershell
-# Regerar as figuras matemáticas e de benchmark
+# 1. Regerar as figuras matemáticas e de benchmark
 & "$env:LOCALAPPDATA\ecm306-venv\Scripts\python.exe" documentos\comum\tema.py
 
-# Regerar o Relatório de Pesquisa em PDF (ABNT)
+# 2a. Regerar o Relatório de Pesquisa em DOCX (Word editável)
+& "$env:LOCALAPPDATA\ecm306-venv\Scripts\python.exe" documentos\relatorio\gerar_relatorio_docx.py
+
+# 2b. Regerar o Relatório de Pesquisa em PDF (ABNT)
 & "$env:LOCALAPPDATA\ecm306-venv\Scripts\python.exe" documentos\relatorio\gerar_relatorio.py
 
-# Regerar a Apresentação PPTX com notas de orador
+# 3. Regerar a Apresentação PPTX com notas de orador e layout balanceado
 & "$env:LOCALAPPDATA\ecm306-venv\Scripts\python.exe" documentos\apresentacao\gerar_apresentacao.py
+
+# 4. Aplicar transições suaves e animações automáticas no PPTX via PowerPoint COM
+powershell -ExecutionPolicy Bypass -File documentos\apresentacao\aplicar_animacoes_pptx.ps1
 ```
 
 ---
