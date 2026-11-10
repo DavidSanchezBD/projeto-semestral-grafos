@@ -3,132 +3,266 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caso Fake News — Rastreamento e Quarentena com Grafos</title>
+  <title>Caso Fake News — Propagação BFS e Quarentena em Grafos (ECM306)</title>
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-  <div class="quadro-container">
-    <!-- Cabeçalho estilo arquivo confidencial / jornal -->
-    <header class="painel-topo">
-      <div class="manchete">
-        <div class="carimbo carimbo-topo">CONFIDENCIAL</div>
-        <div class="titulos">
-          <h1>CASO FAKE NEWS: OPERAÇÃO GRAFOS</h1>
-          <p class="subtitulo">ECM306 — Tópicos Avançados de Estrutura de Dados | Instituto Mauá de Tecnologia</p>
+  <div class="app-shell">
+    <!-- BARRA SUPERIOR UNIFICADA EM 3 PASSOS INTUITIVOS (60px) -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-badge">ECM306</span>
+        <div class="brand-titles">
+          <h1>CASO FAKE NEWS</h1>
+          <span class="brand-sub">O Java 21 pensa · O navegador desenha</span>
         </div>
       </div>
-      <div class="autores">
-        <span><strong>Investigadores:</strong> David Daniel (24.00029-9) &amp; Kauã Ortega (24.00031-0)</span>
-        <span><strong>Orientador:</strong> Prof. Calvetti</span>
+
+      <div class="steps-toolbar">
+        <!-- PASSO 1: ORIGEM -->
+        <div class="step-group">
+          <span class="step-num">1</span>
+          <label for="sel-origem" class="step-label">Origem:</label>
+          <select id="sel-origem" class="ctrl-select" title="Escolha o Paciente Zero que inicia o boato"></select>
+        </div>
+
+        <div class="step-divider"></div>
+
+        <!-- PASSO 2: SIMULAR BFS -->
+        <div class="step-group">
+          <span class="step-num">2</span>
+          <span class="step-label">BFS:</span>
+          <button id="btn-propagar" class="btn btn-primary" title="Anima a propagação em ondas da Busca em Largura">
+            ▶ Propagar em Ondas
+          </button>
+          <button id="btn-passo" class="btn btn-secondary" title="Avança um passo na fila FIFO da BFS (Aula T25)">
+            ⏭ Passo a Passo
+          </button>
+          <button id="btn-limpar" class="btn btn-ghost" title="Limpa a simulação e remove todos os bloqueios">
+            ↺ Limpar
+          </button>
+        </div>
+
+        <div class="step-divider"></div>
+
+        <!-- PASSO 3: CONTENÇÃO / QUARENTENA -->
+        <div class="step-group">
+          <span class="step-num">3</span>
+          <button id="btn-quarentena" class="btn btn-success" title="Executa a Força Bruta O(V*(V+E)) e compara com Maior Grau e Tarjan">
+            🛡️ Comparar Quarentena
+          </button>
+        </div>
+      </div>
+
+      <!-- SELETOR RÁPIDO DE CENÁRIO PARA SALA DE AULA -->
+      <div class="scenario-box">
+        <label for="sel-cenario" class="step-label">Cenário:</label>
+        <select id="sel-cenario" class="ctrl-select scenario-select" title="Atalhos prontos para demonstração ao vivo em sala de aula">
+          <option value="original">Rede Principal (28 pessoas)</option>
+          <option value="marina">Teste 1: Bloquear Marina (Maior Grau = 7)</option>
+          <option value="diego">Teste 2: Bloquear Diego (Ponte Ótima = 20 salvos)</option>
+          <option value="sintetica">Rede Sintética (60 pessoas)</option>
+        </select>
       </div>
     </header>
 
-    <!-- Barra de ferramentas do detetive -->
-    <nav class="barra-controles">
-      <div class="grupo-controles">
-        <label for="sel-paciente"><strong>Paciente Zero:</strong></label>
-        <select id="sel-paciente"></select>
-
-        <button id="btn-propagar" class="btn btn-primario" title="Dispara a propagação do boato pela rede">▶ Propagar Boato</button>
-        <button id="btn-passo" class="btn" title="Avança uma etapa da fila BFS">⏭ Passo a Passo</button>
-        <button id="btn-quarentena" class="btn btn-destaque" title="Calcula o impacto da força bruta e heurísticas">🔎 Analisar Quarentena</button>
-        <button id="btn-limpar" class="btn" title="Limpa o contágio atual">↺ Limpar Propagação</button>
-      </div>
-
-      <div class="grupo-controles grupo-rede">
-        <button id="btn-modo-bloqueio" class="btn btn-alerta" title="Clique nas polaroids para colocar a pessoa em quarentena">Modo Quarentena: OFF</button>
-        <button id="btn-rede-aleatoria" class="btn" title="Carrega rede sintética para teste de escala">Rede Aleatória (n=60)</button>
-        <button id="btn-rede-original" class="btn" title="Restaura a rede original de 28 pessoas">Rede Original (CSV)</button>
-      </div>
-    </nav>
-
-    <!-- Área de trabalho: Quadro de Cortiça + Dossiê Lateral -->
-    <main class="area-investigacao">
-      <!-- Quadro de cortiça com os fios e polaroids -->
-      <section class="quadro-cortica" id="quadro">
-        <svg id="fios-svg" class="camada-fios"></svg>
-        <div id="nos-container" class="camada-nos"></div>
-        <div class="legenda-cortica">
-          <div class="item-legenda"><span class="alfinete pin-familia"></span> Família</div>
-          <div class="item-legenda"><span class="alfinete pin-trabalho"></span> Trabalho</div>
-          <div class="item-legenda"><span class="alfinete pin-faculdade"></span> Faculdade</div>
-          <div class="item-legenda"><span class="alfinete pin-academia"></span> Academia</div>
-          <div class="item-legenda"><span class="alfinete pin-condominio"></span> Condomínio</div>
-          <div class="item-legenda"><span class="borda-articulacao-legenda"></span> Ponto de Articulação</div>
+    <!-- ÁREA PRINCIPAL: GRAFO (ESQUERDA) + PAINEL DE 2 ABAS (DIREITA) -->
+    <main class="workspace">
+      <!-- QUADRO DO GRAFO -->
+      <section class="graph-panel" aria-label="Visualização da Rede Social">
+        <!-- Banner contextual de status no topo do grafo -->
+        <div class="graph-banner" id="graph-banner">
+          <div class="banner-status" id="banner-status">
+            <span class="status-dot"></span>
+            <span id="texto-status">Rede carregada: <strong>28 pessoas</strong> e <strong>42 contatos</strong> em 5 grupos. Clique em <strong>▶ Propagar em Ondas</strong>.</span>
+          </div>
+          <div class="banner-actions">
+            <button id="btn-toggle-tarjan" class="btn-chip" title="Ilumina no grafo os Pontos de Articulação calculados pelo Algoritmo de Tarjan via DFS">
+              ✨ Pontos de Articulação (Tarjan): <strong id="count-tarjan">8</strong>
+            </button>
+          </div>
         </div>
+
+        <!-- Palco Interativo (SVG + Nós HTML sem sobreposição) -->
+        <div class="graph-stage" id="palco-grafo">
+          <svg id="camada-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="glow-bridge" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+            </defs>
+            <g id="grupo-territorios"></g>
+            <g id="grupo-arestas"></g>
+          </svg>
+          <div id="camada-nos" class="nodes-layer"></div>
+
+          <!-- Tooltip flutuante rico no hover -->
+          <div id="node-tooltip" class="node-tooltip hidden"></div>
+        </div>
+
+        <!-- Legenda limpa e instruções de interação direta -->
+        <footer class="graph-legend">
+          <div class="legend-items">
+            <span class="leg-item"><i class="leg-dot onda-0"></i> Onda 0 (Origem)</span>
+            <span class="leg-item"><i class="leg-dot onda-1"></i> Onda 1</span>
+            <span class="leg-item"><i class="leg-dot onda-2"></i> Onda 2</span>
+            <span class="leg-item"><i class="leg-dot onda-3"></i> Onda 3+</span>
+            <span class="leg-item"><i class="leg-dot bloq"></i> Em Quarentena (Bloqueado)</span>
+            <span class="leg-item"><i class="leg-dot salvo"></i> Protegido / Salvo</span>
+            <span class="leg-item"><i class="leg-ring"></i> Ponto de Articulação (Ponte)</span>
+          </div>
+          <div class="legend-help">
+            <span>🖱️ <strong>Clique esquerdo:</strong> escolher Paciente Zero</span>
+            <span>·</span>
+            <span>🚫 <strong>Clique direito (ou ícone no nó):</strong> bloquear / desbloquear pessoa</span>
+          </div>
+        </footer>
       </section>
 
-      <!-- Painel lateral estilo dossiê / papel de máquina de escrever -->
-      <aside class="dossie-painel" id="dossie">
-        <div class="clipe-papel"></div>
-        <div class="dossie-conteudo">
-          <h2>DOSSIÊ DA PROPAGAÇÃO</h2>
-          <div class="carimbo carimbo-caso" id="carimbo-status">AGUARDANDO</div>
+      <!-- PAINEL LATERAL ORGANIZADO EM 2 ABAS LIMPAS -->
+      <aside class="side-panel" aria-label="Métricas e Análise Algorítmica">
+        <!-- 4 Contadores Grandes no Topo -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-danger">
+            <span class="kpi-label">Alcançados</span>
+            <strong class="kpi-value" id="kpi-alcancados">27 / 28</strong>
+            <span class="kpi-sub" id="kpi-alcancados-sub">96% da rede</span>
+          </div>
+          <div class="kpi-card kpi-warning">
+            <span class="kpi-label">Ondas BFS</span>
+            <strong class="kpi-value" id="kpi-ondas">9 ondas</strong>
+            <span class="kpi-sub" id="kpi-ondas-sub">Saltos máx.</span>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <span class="kpi-label">Quarentena</span>
+            <strong class="kpi-value" id="kpi-bloqueados">Nenhum</strong>
+            <span class="kpi-sub" id="kpi-bloqueados-sub">0 bloqueados</span>
+          </div>
+          <div class="kpi-card kpi-success">
+            <span class="kpi-label">Protegidos</span>
+            <strong class="kpi-value" id="kpi-protegidos">0 (0%)</strong>
+            <span class="kpi-sub" id="kpi-protegidos-sub">Pessoas salvas</span>
+          </div>
+        </div>
 
-          <div class="resumo-metricas">
-            <div class="metrica">
-              <span class="valor" id="met-alcancados">0</span>
-              <span class="rotulo">Atingidos</span>
+        <!-- Seletor de Abas (Aba 1: BFS | Aba 2: Quarentena) -->
+        <div class="tabs-bar" role="tablist">
+          <button id="tab-btn-bfs" class="tab-btn active" role="tab" aria-selected="true">
+            📡 1. Ondas &amp; Fila BFS
+          </button>
+          <button id="tab-btn-quarentena" class="tab-btn" role="tab" aria-selected="false">
+            🛡️ 2. Quarentena &amp; Pontes
+          </button>
+        </div>
+
+        <!-- CONTEÚDO ABA 1: ONDAS DE CONTÁGIO & FILA FIFO -->
+        <div id="tab-pane-bfs" class="tab-pane active" role="tabpanel">
+          <!-- Resumo de Pessoas Protegidas / Isoladas -->
+          <div class="panel-card" id="card-protegidos-bfs">
+            <div class="card-header">
+              <h3>🛡️ Pessoas Fora de Alcance / Salvas</h3>
+              <span class="badge-pill badge-green" id="badge-nao-alcancados">1 pessoa</span>
             </div>
-            <div class="metrica">
-              <span class="valor" id="met-rodadas">0</span>
-              <span class="rotulo">Rodadas (BFS)</span>
-            </div>
-            <div class="metrica">
-              <span class="valor" id="met-bloqueados">0</span>
-              <span class="rotulo">Quarentena</span>
-            </div>
-            <div class="metrica">
-              <span class="valor" id="met-protegidos">0</span>
-              <span class="rotulo">Protegidos</span>
-            </div>
+            <div id="lista-nao-alcancados" class="chips-wrap"></div>
           </div>
 
-          <!-- Rastreamento da BFS (como no slide 15 da aula T25) -->
-          <div class="secao-dossie">
-            <h3>RASTREAMENTO DA FILA BFS (O(V + E))</h3>
-            <div class="tabela-container">
-              <table class="tabela-rastreamento" id="tabela-bfs">
+          <!-- Ondas de Contágio por Nível -->
+          <div class="panel-card">
+            <div class="card-header">
+              <h3>🌊 Ondas de Contágio (Níveis da BFS)</h3>
+              <span class="card-hint">Passe o mouse para destacar a onda</span>
+            </div>
+            <div id="lista-ondas" class="waves-list"></div>
+          </div>
+
+          <!-- Tabela da Fila FIFO (Aula T25) -->
+          <div class="panel-card flex-fill">
+            <div class="card-header">
+              <h3>📋 Rastreamento da Fila FIFO (Aula T25)</h3>
+              <span class="badge-pill badge-blue" id="badge-etapas-bfs">27 etapas</span>
+            </div>
+            <div class="table-scroll">
+              <table class="clean-table" id="tabela-bfs">
                 <thead>
                   <tr>
-                    <th>Etapa</th>
+                    <th>#</th>
                     <th>Fila Antes</th>
-                    <th>Vértice Retirado</th>
-                    <th>Novos Descobertos</th>
+                    <th>Retirado</th>
+                    <th>Novos Enfileirados</th>
                   </tr>
                 </thead>
-                <tbody id="corpo-tabela-bfs">
-                  <tr><td colspan="4" class="msg-vazia">Inicie a propagação para rastrear.</td></tr>
-                </tbody>
+                <tbody id="tbody-bfs"></tbody>
               </table>
             </div>
           </div>
+        </div>
 
-          <!-- Diagnóstico de Quarentena: Força Bruta vs Heurística -->
-          <div class="secao-dossie">
-            <h3>DIAGNÓSTICO DE QUARENTENA</h3>
-            <div id="alerta-heuristica" class="alerta-comparacao">
-              Clique em <em>Analisar Quarentena</em> para avaliar quem deve ser bloqueado.
+        <!-- CONTEÚDO ABA 2: QUARENTENA (MAIOR GRAU vs. FORÇA BRUTA / TARJAN) -->
+        <div id="tab-pane-quarentena" class="tab-pane" role="tabpanel">
+          <!-- Comparativo Lado a Lado: Maior Grau vs. Ótimo Força Bruta -->
+          <div class="versus-grid">
+            <div class="versus-card versus-bad" id="card-heuristica">
+              <div class="versus-tag">❌ Heurística Maior Grau</div>
+              <h4 id="mg-nome">Marina (Faculdade)</h4>
+              <div class="versus-meta" id="mg-meta">Grau 7 (Mais popular)</div>
+              <div class="versus-big" id="mg-salvos">0 protegidos (0%)</div>
+              <p class="versus-desc" id="mg-desc">Grupo possui rotas internas redundantes; o boato contorna Marina.</p>
+              <button id="btn-testar-mg" class="btn btn-sm btn-outline-danger">
+                Testar no Grafo
+              </button>
             </div>
 
-            <div class="ranking-container">
-              <h4>Top Candidatos a Bloquear (Força Bruta O(V·(V+E))):</h4>
-              <ul class="lista-ranking" id="lista-ranking">
-                <li class="msg-vazia">Nenhuma análise executada.</li>
-              </ul>
+            <div class="versus-card versus-good" id="card-otimo">
+              <div class="versus-tag">✅ Ótimo Força Bruta</div>
+              <h4 id="fb-nome">Diego (Família)</h4>
+              <div class="versus-meta" id="fb-meta">Grau 5 · Ponte (Tarjan)</div>
+              <div class="versus-big" id="fb-salvos">20 protegidos (74%)</div>
+              <p class="versus-desc" id="fb-desc">Ponto de Articulação que separa a Família de 3 grupos inteiros!</p>
+              <button id="btn-aplicar-fb" class="btn btn-sm btn-solid-success">
+                Aplicar Bloqueio Ótimo
+              </button>
             </div>
           </div>
 
-          <!-- Articulações detectadas por Tarjan -->
-          <div class="secao-dossie">
-            <h3>PONTOS DE ARTICULAÇÃO (TARJAN O(V + E))</h3>
-            <p class="desc-articulacoes">Pessoas cuja remoção divide grupos ou isola membros:</p>
-            <div id="tags-articulacoes" class="tags-container"></div>
+          <!-- Ranking Completo da Força Bruta O(V*(V+E)) -->
+          <div class="panel-card">
+            <div class="card-header">
+              <h3>🏆 Ranking da Força Bruta — O(V·(V+E))</h3>
+              <span class="badge-pill badge-slate" id="badge-tempo-fb">Java: 0,15 ms</span>
+            </div>
+            <div id="lista-ranking-fb" class="ranking-list"></div>
           </div>
 
-          <!-- Dica didática -->
-          <div class="nota-rodape">
-            <p><strong>Nota Didática:</strong> Toda a lógica estrutural de grafos, busca em largura, cálculo de articulações e simulação de corte é executada pelo servidor <code>Java</code> nativo via <code>HttpServer</code>.</p>
+          <!-- Pontos de Articulação (Tarjan) + Benchmark de Escala -->
+          <div class="panel-card">
+            <div class="card-header">
+              <h3>🔗 Pontos de Articulação (Tarjan — O(V+E))</h3>
+              <button id="btn-benchmark" class="btn-link" title="Executa benchmark real no Java de N=100 a N=2000">
+                ⏱️ Benchmark N=100..2000
+              </button>
+            </div>
+            <p class="card-subtext">Vértices cuja remoção desconecta componentes da rede:</p>
+            <div id="lista-articulacoes" class="chips-wrap"></div>
+
+            <!-- Painel expansível do Benchmark Empírico -->
+            <div id="box-benchmark" class="benchmark-box hidden">
+              <div class="bench-header">
+                <strong>Escalabilidade em Java 21 (Força Bruta Exata)</strong>
+                <span id="bench-status">Calculado em tempo real</span>
+              </div>
+              <table class="clean-table compact-table">
+                <thead>
+                  <tr>
+                    <th>Pessoas (V)</th>
+                    <th>Contatos (E)</th>
+                    <th>Candidatos</th>
+                    <th>Tempo (ms)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-benchmark"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </aside>

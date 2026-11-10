@@ -140,14 +140,18 @@ public final class TestesAlgoritmos {
             if (!java.nio.file.Files.isDirectory(d)) d = Path.of("demo", "dados");
             Grafo g = LeitorCSV.ler(d.resolve("pessoas.csv"), d.resolve("contatos.csv"));
             igual(28, g.numeroDeVertices(), "28 pessoas");
+            igual(42, g.numeroDeArestas(), "42 contatos");
             igual(0, g.grau(27), "Sônia isolada");
+            igual(7, g.grau(12), "Marina tem grau 7 (máximo da rede)");
+            igual(5, g.grau(3), "Diego tem grau 5");
             ResultadoQuarentena q = Quarentena.analisar(g, 0, Set.of());
             verdadeiro(!q.heuristicaAcertou(), "o maior grau deve errar nesta rede");
             igual(12, q.melhorMaiorGrau().pessoa(), "maior grau = Marina");
+            igual(7, q.melhorMaiorGrau().grau(), "grau de Marina no ranking = 7");
             igual(0, q.melhorMaiorGrau().protegidos(), "bloquear Marina não protege ninguém");
             igual(3, q.melhorForcaBruta().pessoa(), "melhor = Diego (ponte)");
             igual(20, q.melhorForcaBruta().protegidos(), "Diego protege 20");
-            igual(List.of(2, 3, 5, 6, 9, 11, 13, 19, 24), q.articulacoes(), "articulações da rede");
+            igual(List.of(2, 3, 5, 6, 9, 11, 19, 24), q.articulacoes(), "8 articulações da rede");
         } catch (java.io.IOException e) {
             throw new AssertionError("não leu o CSV: " + e);
         }
