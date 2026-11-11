@@ -3,4 +3,5 @@ out/
 __pycache__/
 .venv/
 demo/fakenews.jar
+.sf/
 
